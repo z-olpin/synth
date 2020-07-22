@@ -41,7 +41,6 @@ class S {
     let g = this.ctx.createGain()
     o.connect(g)
     g.connect(this.sink)
-
     g.gain.setTargetAtTime(1.5, t, 0.0)
     g.gain.setTargetAtTime(0.0, t, 0.1)
     o.frequency.value = 100;
@@ -64,8 +63,6 @@ class S {
     s.connect(g);
     g.connect(bpf);
     bpf.connect(this.sink)
-    // hpf.connect(this.sink);
-
     s.start(t);
   }
 
@@ -97,7 +94,7 @@ class S {
     return curve;
   };
 
-  oscGroup(t, note) {
+ oscGroup(t, note) {
     if (this.oscs[this.oscs.length - 1]) {
       let key = this.keys[note - 1];
       if (Math.abs(this.oscs[this.oscs.length - 1] - key) < 1) key = 329.62;
@@ -148,7 +145,7 @@ class S {
         for (let j = 0; j < steps.length; j++) {
           let idx = Math.round(steps[j] / ((beatLength / 4)))
           let note = this.track.tracks[i][idx % this.track.tracks[i].length]
-          if (note != 0) {
+          if (note !== 0) {
             (this[i])(steps[j], note)
           }
         }
@@ -243,10 +240,11 @@ let track = {
 let s = new S(new AudioContext(), track)
 
 // Why? CSS.
-document.querySelectorAll('button').forEach(e => e.addEventListener("click", e => {
-  e.target.style.backgroundColor = '#4495FF';
-  return setTimeout(() => e.target.style.backgroundColor = '#0050db', 300)
-}))
+document.querySelectorAll('button')
+  .forEach(e => e.addEventListener("click", e => {
+      e.target.style.backgroundColor = '#4495FF';
+      return setTimeout(() => e.target.style.backgroundColor = '#0050db', 300)
+  }))
 
 document.querySelector(".start").addEventListener("click", () => {
   s = new S(new AudioContext(), track)
