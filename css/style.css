@@ -1,0 +1,24 @@
+button {
+    margin: 2rem;
+    font-size: 5rem;
+    background-color: #0050db;
+    border: 0.2rem solid transparent;
+    border-radius: 5rem;
+    padding: 1rem 2rem;
+    text-align: center;
+    vertical-align: center;
+    align-content: center;
+    color: white;
+    font-family: sans-serif;
+}
+
+button:hover {
+    transition: border 100ms ease;
+    border: 0.2rem solid white;
+}
+
+body {
+    width: 100%;
+    height: 100vh;
+    background-color: fuchsia;
+}
