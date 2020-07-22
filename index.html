@@ -3,38 +3,13 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="./css/style.css">
   <title>Document</title>
-  <style>
-    button {
-      margin: 2rem;
-      font-size: 5rem;
-      background-color: #0050db;
-      border: 0;
-      border-radius: 5rem;
-      padding: 1rem 2rem;
-      text-align: center;
-      vertical-align: center;
-      align-content: center;
-      color: white;
-      font-family: sans-serif;
-    }
-    body {
-      width: 100%;
-      height: 100vh;
-      background-color: fuchsia;
-    }
-  </style>
 </head>
 <body>
   <button class="start">Start</button>
   <button class="stop">Stop</button>
   <button class="key">+</button>
-  <script src="sy.js"></script>
-<script>
-  document.querySelectorAll('button').forEach(e => e.addEventListener("click", e => {
-    e.target.style.backgroundColor = '#4495FF';
-    return setTimeout(() => e.target.style.backgroundColor = '#0050db', 300)
-  }))
-</script>
+  <script src="synth.js"></script>
 </body>
 </html>
