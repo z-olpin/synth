@@ -1,4 +1,4 @@
-class S {
+class Synth {
   constructor(ctx, track) {
     this.ctx = ctx;
     this.oscs = [];
@@ -13,72 +13,71 @@ class S {
   }
 
   noiseBuffer() {
-    if (!S._noiseBuffer) {
-      S._noiseBuffer = this.ctx.createBuffer(1, this.ctx.sampleRate / 10, this.ctx.sampleRate)
-      let cd = S._noiseBuffer.getChannelData(0)
+    if (!Synth._noiseBuffer) {
+      Synth._noiseBuffer = this.ctx.createBuffer(1, this.ctx.sampleRate / 10, this.ctx.sampleRate)
+      let cd = Synth._noiseBuffer.getChannelData(0)
       for (let i = 0; i < cd.length; i++) {
         cd[i] = Math.random() * 2 - 1
       }
     }
-    return S._noiseBuffer
+    return Synth._noiseBuffer
   }
 
   reverbBuffer() {
     let len = 0.3 * this.ctx.sampleRate
     let decay = 0.8
-    let buf = this.ctx.createBuffer(2, len, this.ctx.sampleRate)
+    let buffer = this.ctx.createBuffer(2, len, this.ctx.sampleRate)
     for (let c = 0; c < 2; c++) {
-      let channelData = buf.getChannelData(c)
+      let channelData = buffer.getChannelData(c)
       for (let i = 0; i < channelData.length; i++) {
         channelData[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / len, decay)
       }
     }
-    return buf
+    return buffer
   }
 
-  kick(t) {
-    let o = this.ctx.createOscillator()
-    let g = this.ctx.createGain()
-    o.connect(g)
-    g.connect(this.sink)
-    g.gain.setTargetAtTime(1.5, t, 0.0)
-    g.gain.setTargetAtTime(0.0, t, 0.1)
-    o.frequency.value = 100;
-    o.frequency.setTargetAtTime(30, t, 0.15)
-
-    o.start(t)
-    o.stop(t + 1)
+  kick(time) {
+    let osc = this.ctx.createOscillator()
+    let gain = this.ctx.createGain()
+    osc.connect(gain)
+    gain.connect(this.sink)
+    gain.gain.setTargetAtTime(1.5, time, 0.0)
+    gain.gain.setTargetAtTime(0.0, time, 0.1)
+    osc.frequency.value = 100;
+    osc.frequency.setTargetAtTime(30, time, 0.15)
+    osc.start(time)
+    osc.stop(time + 1)
   }
 
-  snare(t) {
-    let s = this.ctx.createBufferSource()
-    s.buffer = this.noiseBuffer()
-    let g = this.ctx.createGain()
+  snare(time) {
+    let src = this.ctx.createBufferSource()
+    src.buffer = this.noiseBuffer()
+    let gain = this.ctx.createGain()
     let bpf = this.ctx.createBiquadFilter();
     bpf.type = "lowpass";
     bpf.frequency.value = 7000;
-    g.gain.setValueAtTime(1.0, t);
-    g.gain.setTargetAtTime(0.2, t, 0.01);
-    g.gain.setTargetAtTime(0.0, t, 0.02);
-    s.connect(g);
-    g.connect(bpf);
+    gain.gain.setValueAtTime(1.0, time);
+    gain.gain.setTargetAtTime(0.2, time, 0.01);
+    gain.gain.setTargetAtTime(0.0, time, 0.02);
+    src.connect(gain);
+    gain.connect(bpf);
     bpf.connect(this.sink)
-    s.start(t);
+    src.start(time);
   }
 
-  hat(t) {
-    let s = this.ctx.createBufferSource();
-    s.buffer = this.noiseBuffer();
-    let g = this.ctx.createGain();
+  hat(time) {
+    let src = this.ctx.createBufferSource();
+    src.buffer = this.noiseBuffer();
+    let gain = this.ctx.createGain();
     let hpf = this.ctx.createBiquadFilter();
     hpf.type = "highpass";
     hpf.frequency.value = 3205;
-    g.gain.setValueAtTime(0.65, t);
-    g.gain.setTargetAtTime(0.0, t, 0.03);
-    s.connect(g);
-    g.connect(hpf);
+    gain.gain.setValueAtTime(0.65, time);
+    gain.gain.setTargetAtTime(0.0, time, 0.03);
+    src.connect(gain);
+    gain.connect(hpf);
     hpf.connect(this.sink);
-    s.start(t);
+    src.start(time);
   }
 
   makeDistortionCurve(amount) {
@@ -94,12 +93,11 @@ class S {
     return curve;
   };
 
- oscGroup(t, note) {
+ oscGroup(time, note) {
     if (this.oscs[this.oscs.length - 1]) {
       let key = this.keys[note - 1];
       if (Math.abs(this.oscs[this.oscs.length - 1] - key) < 1) key = 329.62;
-      this.oscs[this.oscs.length - 1].frequency.setValueAtTime
-      (key, t)
+      this.oscs[this.oscs.length - 1].frequency.setValueAtTime(key, time)
     }
   }
 
@@ -237,7 +235,7 @@ let track = {
   }
 }
 
-let s = new S(new AudioContext(), track)
+let syn = new Synth(new AudioContext(), track)
 
 // Why? CSS.
 document.querySelectorAll('button')
@@ -247,10 +245,10 @@ document.querySelectorAll('button')
   }))
 
 document.querySelector(".start").addEventListener("click", () => {
-  s = new S(new AudioContext(), track)
-  s.start()
+  syn = new Synth(new AudioContext(), track)
+  syn.start()
 })
 
-document.querySelector(".stop").addEventListener("click", () => s.ctx.close())
+document.querySelector(".stop").addEventListener("click", () => syn.ctx.close())
 
-document.querySelector(".key").addEventListener("click", () => s.add())
+document.querySelector(".key").addEventListener("click", () => syn.add())
